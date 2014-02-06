@@ -114,9 +114,18 @@ rangeToRSet (RAIntersection a b)  = RSet.intersection (rangeToRSet a) (rangeToRS
 rangeProp :: RSetAction Int8 -> Bool
 rangeProp seta = Set.elems (rangeToSet seta) == RSet.elems (rangeToRSet seta)
 
+ordered :: Ord a => [(a,a)] -> Bool
+ordered rs = all lt $ zip rs (tail rs)
+  where
+    lt :: Ord a => ((a,a),(a,a)) -> Bool
+    lt ((_,y),(u,_)) = y < u
+
+orderedProp :: RSetAction Int8 -> Bool
+orderedProp = ordered . RSet.toRangeList . rangeToRSet
 
 qcProps :: TestTree
 qcProps = testGroup "QuickCheck properties"
   [ QC.testProperty "element operations similar" elementsProp
   , QC.testProperty "range operations similar" rangeProp
+  , QC.testProperty "ranges remain ordered" orderedProp
   ]
