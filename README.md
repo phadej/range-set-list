@@ -1,5 +1,7 @@
 # range-set-list
 
+[![Build Status](https://travis-ci.org/phadej/range-set-list.png?branch=master)](https://travis-ci.org/phadej/range-set-list)
+
 A trivial implementation of range sets.
 
 This module is intended to be imported qualified, to avoid name
