@@ -96,8 +96,9 @@ null = Prelude.null . toRangeList
 
 -- | /O(n)/. Is the element in the set?
 member :: (Ord a, Enum a) => a -> RSet a -> Bool
-member x (RSet xs) = any f xs
+member x (RSet xs) = any f $ takeWhile g xs
   where f (a, b) = a <= x && x <= b
+        g (a,_) = a <= x
 
 -- | /O(n)/. Is the element not in the set?
 notMember :: (Ord a, Enum a) => a -> RSet a -> Bool
