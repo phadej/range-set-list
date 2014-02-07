@@ -70,7 +70,7 @@ import qualified Prelude
 
 import Data.Monoid (Monoid(..))
 
--- | Internally set is represented as list of distinct inclusive ranges.
+-- | Internally set is represented as sorted list of distinct inclusive ranges.
 newtype RSet a = RSet [(a, a)]
   deriving (Eq, Ord)
 
