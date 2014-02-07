@@ -120,8 +120,12 @@ ordered rs = all lt $ zip rs (tail rs)
     lt :: Ord a => ((a,a),(a,a)) -> Bool
     lt ((_,y),(u,_)) = y < u
 
+pairOrdered :: Ord a => [(a, a)] -> Bool
+pairOrdered = all (uncurry (<=))
+
 orderedProp :: RSetAction Int8 -> Bool
-orderedProp = ordered . RSet.toRangeList . rangeToRSet
+orderedProp setAction = ordered rs && pairOrdered rs
+  where rs = RSet.toRangeList . rangeToRSet $ setAction
 
 qcProps :: TestTree
 qcProps = testGroup "QuickCheck properties"
