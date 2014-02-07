@@ -65,6 +65,15 @@ toRSet (AIntersection a b)  = RSet.intersection (toRSet a) (toRSet b)
 elementsProp :: SetAction Int -> Bool
 elementsProp seta = Set.elems (toSet seta) == RSet.elems (toRSet seta)
 
+nullProp :: SetAction Int -> Bool
+nullProp seta = Set.null (toSet seta) == RSet.null (toRSet seta)
+
+memberProp :: Int -> SetAction Int -> Bool
+memberProp x seta = Set.member x (toSet seta) == RSet.member x (toRSet seta)
+
+notMemberProp :: Int -> SetAction Int -> Bool
+notMemberProp x seta = Set.notMember x (toSet seta) == RSet.notMember x (toRSet seta)
+
 data RSetAction a = RAEmpty
                   | RASingleton (a, a)
                   | RAFromList [(a, a)]
@@ -127,9 +136,13 @@ orderedProp :: RSetAction Int8 -> Bool
 orderedProp setAction = ordered rs && pairOrdered rs
   where rs = RSet.toRangeList . rangeToRSet $ setAction
 
+
 qcProps :: TestTree
 qcProps = testGroup "QuickCheck properties"
   [ QC.testProperty "element operations similar" elementsProp
+  , QC.testProperty "null operation similar" nullProp
+  , QC.testProperty "member operation similar" memberProp
+  , QC.testProperty "notMember operation similar" notMemberProp
   , QC.testProperty "range operations similar" rangeProp
   , QC.testProperty "ranges remain ordered" orderedProp
   ]
