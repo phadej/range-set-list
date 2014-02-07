@@ -28,3 +28,8 @@ pred x < x
 
 and there aren't elements in between (not true for `Float` and `Double`).
 Also `succ` and `pred` are never called for largest or smallest value respectively.
+
+## Changelog
+
+- 0.0.2 More properties &amp; test coverage
+- 0.0.1 Initial release
