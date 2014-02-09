@@ -4,6 +4,8 @@
 
 A trivial implementation of range sets.
 
+You can find the package (and it's documentation) on [hackage](http://hackage.haskell.org/package/range-set-list).
+
 This module is intended to be imported qualified, to avoid name
 clashes with Prelude functions, e.g.
 
