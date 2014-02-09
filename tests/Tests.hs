@@ -10,6 +10,8 @@ import qualified Data.RangeSet.List as RSet
 import Control.Applicative
 import Data.Int
 
+import Data.Monoid
+
 main :: IO ()
 main = defaultMain tests
 
@@ -136,7 +138,16 @@ orderedProp :: RSetAction Int8 -> Bool
 orderedProp setAction = ordered rs && pairOrdered rs
   where rs = RSet.toRangeList . rangeToRSet $ setAction
 
+-- Monoid laws
+monoidLaws :: TestTree
+monoidLaws = testGroup "MonoidLaws"
+  [ QC.testProperty "left identity"   (\a -> rs a == mempty <> rs a)
+  , QC.testProperty "right identity"  (\a -> rs a == rs a <> mempty)
+  , QC.testProperty "associativity"   (\a b c -> rs a <> (rs b <> rs c) == (rs a <> rs b) <> rs c)
+  ]
+  where rs = rangeToRSet :: RSetAction Int -> RSet Int
 
+-- All QuickCheck properties
 qcProps :: TestTree
 qcProps = testGroup "QuickCheck properties"
   [ QC.testProperty "element operations similar" elementsProp
@@ -145,4 +156,5 @@ qcProps = testGroup "QuickCheck properties"
   , QC.testProperty "notMember operation similar" notMemberProp
   , QC.testProperty "range operations similar" rangeProp
   , QC.testProperty "ranges remain ordered" orderedProp
+  , monoidLaws
   ]
