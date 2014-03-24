@@ -33,5 +33,6 @@ Also `succ` and `pred` are never called for largest or smallest value respective
 
 ## Changelog
 
+- 0.0.3 Bump tasty and QuickCheck versions
 - 0.0.2 More properties &amp; test coverage
 - 0.0.1 Initial release

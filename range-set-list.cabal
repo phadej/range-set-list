@@ -1,5 +1,5 @@
 name:                range-set-list
-version:             0.0.2
+version:             0.0.3
 synopsis:            Memory efficient sets with continuous ranges of elements.
 description:         Memory efficient sets with continuous ranges of elements. List based implementation. Interface mimics "Data.Set" interface where possible.
 homepage:            https://github.com/phadej/range-set-list
@@ -33,6 +33,6 @@ test-suite test
   ghc-options:         -Wall
   build-depends:       base >=4.6 && <5,
                        containers >= 0.5 && <0.6,
-                       tasty >= 0.7,
-                       tasty-quickcheck >= 0.3,
+                       tasty >= 0.8,
+                       tasty-quickcheck == 0.8.0.3,
                        range-set-list
