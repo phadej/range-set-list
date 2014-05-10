@@ -123,7 +123,7 @@ singletonRange (x, y) | x > y     = empty
 
 -- | /O(n)/. Insert an element in a set.
 insert :: (Ord a, Enum a) => a -> RSet a -> RSet a
-insert x set = insertRange (x, x) set
+insert x = insertRange (x, x)
 
 -- | /O(n)/. Insert a continuos range in a set.
 insertRange :: (Ord a, Enum a) => (a, a) -> RSet a -> RSet a
@@ -144,7 +144,7 @@ insertRange' r@(x, y) set@(s@(u, v) : xs)
 
 -- | /O(n). Delete an element from a set.
 delete :: (Ord a, Enum a) => a -> RSet a -> RSet a
-delete x set = deleteRange (x, x) set
+delete x = deleteRange (x, x)
 
 -- | /O(n). Delete a continuos range from a set.
 deleteRange :: (Ord a, Enum a) => (a, a) -> RSet a -> RSet a

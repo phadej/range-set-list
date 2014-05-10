@@ -1,3 +1,11 @@
 language: haskell
 ghc:
   - 7.6
+  - 7.8
+
+before_install:
+  - cabal install packdeps
+
+script:
+  - cabal test --show-details=always
+  - packdeps range-set-list.cabal
