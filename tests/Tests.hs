@@ -64,17 +64,17 @@ toRSet (AUnion a b)         = RSet.union (toRSet a) (toRSet b)
 toRSet (ADifference a b)    = RSet.difference (toRSet a) (toRSet b)
 toRSet (AIntersection a b)  = RSet.intersection (toRSet a) (toRSet b)
 
-elementsProp :: SetAction Int -> Bool
-elementsProp seta = Set.elems (toSet seta) == RSet.elems (toRSet seta)
+elementsProp :: SetAction Int -> Property
+elementsProp seta = Set.elems (toSet seta) === RSet.elems (toRSet seta)
 
-nullProp :: SetAction Int -> Bool
-nullProp seta = Set.null (toSet seta) == RSet.null (toRSet seta)
+nullProp :: SetAction Int -> Property
+nullProp seta = Set.null (toSet seta) === RSet.null (toRSet seta)
 
-memberProp :: Int -> SetAction Int -> Bool
-memberProp x seta = Set.member x (toSet seta) == RSet.member x (toRSet seta)
+memberProp :: Int -> SetAction Int -> Property
+memberProp x seta = Set.member x (toSet seta) === RSet.member x (toRSet seta)
 
-notMemberProp :: Int -> SetAction Int -> Bool
-notMemberProp x seta = Set.notMember x (toSet seta) == RSet.notMember x (toRSet seta)
+notMemberProp :: Int -> SetAction Int -> Property
+notMemberProp x seta = Set.notMember x (toSet seta) === RSet.notMember x (toRSet seta)
 
 data RSetAction a = RAEmpty
                   | RASingleton (a, a)
@@ -100,7 +100,7 @@ instance Arbitrary a => Arbitrary (RSetAction a) where
                                  , RAIntersection <$> arbitrary2 <*> arbitrary2
                                  ]
                               where arbitrary1 = arbitrary' $ n - 1
-                                    arbitrary2 = arbitrary' $ n `div` 2  
+                                    arbitrary2 = arbitrary' $ n `div` 2
 
 rangeToSet :: (Enum a, Ord a) => RSetAction a -> Set a
 rangeToSet RAEmpty               = Set.empty
@@ -122,8 +122,8 @@ rangeToRSet (RAUnion a b)         = RSet.union (rangeToRSet a) (rangeToRSet b)
 rangeToRSet (RADifference a b)    = RSet.difference (rangeToRSet a) (rangeToRSet b)
 rangeToRSet (RAIntersection a b)  = RSet.intersection (rangeToRSet a) (rangeToRSet b)
 
-rangeProp :: RSetAction Int8 -> Bool
-rangeProp seta = Set.elems (rangeToSet seta) == RSet.elems (rangeToRSet seta)
+rangeProp :: RSetAction Int8 -> Property
+rangeProp seta = Set.elems (rangeToSet seta) === RSet.elems (rangeToRSet seta)
 
 ordered :: Ord a => [(a,a)] -> Bool
 ordered rs = all lt $ zip rs (tail rs)
@@ -141,9 +141,9 @@ orderedProp setAction = ordered rs && pairOrdered rs
 -- Monoid laws
 monoidLaws :: TestTree
 monoidLaws = testGroup "MonoidLaws"
-  [ QC.testProperty "left identity"   (\a -> rs a == mempty <> rs a)
-  , QC.testProperty "right identity"  (\a -> rs a == rs a <> mempty)
-  , QC.testProperty "associativity"   (\a b c -> rs a <> (rs b <> rs c) == (rs a <> rs b) <> rs c)
+  [ QC.testProperty "left identity"   (\a -> rs a === mempty <> rs a)
+  , QC.testProperty "right identity"  (\a -> rs a === rs a <> mempty)
+  , QC.testProperty "associativity"   (\a b c -> rs a <> (rs b <> rs c) === (rs a <> rs b) <> rs c)
   ]
   where rs = rangeToRSet :: RSetAction Int -> RSet Int
 
