@@ -44,6 +44,7 @@ module Data.RangeSet.List (
 
   -- * Construction
   , empty
+  , full
   , singleton
   , singletonRange
   , insert
