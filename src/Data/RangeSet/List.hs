@@ -56,6 +56,9 @@ module Data.RangeSet.List (
   , difference
   , intersection
 
+  -- * Complement
+  , complement
+
   -- * Conversion
   , elems
   , toList
@@ -184,6 +187,12 @@ difference set (RSet xs) = Prelude.foldr deleteRange set xs
 -- | /O(n*m)/. The intersection of two sets.
 intersection :: (Ord a, Enum a) => RSet a -> RSet a -> RSet a
 intersection a b = a \\ (a \\ b)
+
+{- Complement -}
+
+-- | /O(n)/. Complement of the set.
+complement :: (Ord a, Enum a, Bounded a) => RSet a -> RSet a
+complement a = singletonRange (minBound, maxBound) `difference` a
 
 {- Conversion -}
 
