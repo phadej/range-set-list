@@ -113,6 +113,10 @@ notMember a r = not $ member a r
 empty :: RSet a
 empty = RSet []
 
+-- | /O(1)/. The full set.
+full :: Bounded a => RSet a
+full = RSet [(minBound, maxBound)]
+
 -- | /O(1)/. Create a singleton set.
 singleton :: a -> RSet a
 singleton x = RSet [(x, x)]
@@ -192,7 +196,7 @@ intersection a b = a \\ (a \\ b)
 
 -- | /O(n)/. Complement of the set.
 complement :: (Ord a, Enum a, Bounded a) => RSet a -> RSet a
-complement a = singletonRange (minBound, maxBound) `difference` a
+complement a = full `difference` a
 
 {- Conversion -}
 
