@@ -67,6 +67,9 @@ toRSet (AIntersection a b)  = RSet.intersection (toRSet a) (toRSet b)
 elementsProp :: SetAction Int -> Property
 elementsProp seta = Set.elems (toSet seta) === RSet.elems (toRSet seta)
 
+sizeProp :: SetAction Int -> Property
+sizeProp seta = Set.size (toSet seta) === RSet.size (toRSet seta)
+
 nullProp :: SetAction Int -> Property
 nullProp seta = Set.null (toSet seta) === RSet.null (toRSet seta)
 
@@ -159,6 +162,7 @@ monoidLaws = testGroup "MonoidLaws"
 qcProps :: TestTree
 qcProps = testGroup "QuickCheck properties"
   [ QC.testProperty "element operations similar" elementsProp
+  , QC.testProperty "size consistent" sizeProp
   , QC.testProperty "null operation similar" nullProp
   , QC.testProperty "member operation similar" memberProp
   , QC.testProperty "notMember operation similar" notMemberProp
