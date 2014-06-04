@@ -144,8 +144,9 @@ orderedProp setAction = ordered rs && pairOrdered rs
 -- Complement laws
 complementProps :: TestTree
 complementProps = testGroup "complement"
-  [ QC.testProperty "definition" (\a e -> RSet.member e (rs a) === RSet.notMember e (RSet.complement (rs a)))
-  , QC.testProperty "involutive" (\a -> rs a === RSet.complement (RSet.complement (rs a)))
+  [ QC.testProperty "definition"   (\a e -> RSet.member e (rs a) === RSet.notMember e (RSet.complement (rs a)))
+  , QC.testProperty "involutive"   (\a -> rs a === RSet.complement (RSet.complement (rs a)))
+  , QC.testProperty "(full \\\\)"  (\a -> RSet.complement (rs a) === RSet.full RSet.\\ (rs a))
   ]
   where rs = rangeToRSet :: RSetAction Int -> RSet Int
 
