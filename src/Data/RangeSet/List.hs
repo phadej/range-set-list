@@ -216,7 +216,7 @@ findMin :: RSet a -> a
 findMin (RSet ((x, _) : _))  = x
 findMin _                    = error "RangeSet.List.findMin: empty set"
 
--- | /O(n)/. The minimal element of a set.
+-- | /O(n)/. The maximal element of a set.
 findMax :: RSet a -> a
 findMax (RSet rs) = findMax' rs
   where findMax' [(_, x)]  = x
