@@ -150,9 +150,31 @@ complementProps = testGroup "complement"
   ]
   where rs = rangeToRSet :: RSetAction Int -> RSet Int
 
+-- Min/Max laws
+
+findMinProp :: RSetAction Int8 -> Property
+findMinProp seta
+  | Set.null s  = label "trivial" $ property True
+  | otherwise   = Set.findMin s === RSet.findMin rs
+  where s   = rangeToSet seta
+        rs  = rangeToRSet seta
+
+findMaxProp :: RSetAction Int8 -> Property
+findMaxProp seta
+  | Set.null s  = label "trivial" $ property True
+  | otherwise   = Set.findMax s === RSet.findMax rs
+  where s   = rangeToSet seta
+        rs  = rangeToRSet seta
+
+minMaxProps :: TestTree
+minMaxProps = testGroup "Min/Max properties"
+  [ QC.testProperty "findMin"  findMinProp
+  , QC.testProperty "findMax"  findMaxProp
+  ]
+
 -- Monoid laws
 monoidLaws :: TestTree
-monoidLaws = testGroup "MonoidLaws"
+monoidLaws = testGroup "Monoid laws"
   [ QC.testProperty "left identity"   (\a -> rs a === mempty <> rs a)
   , QC.testProperty "right identity"  (\a -> rs a === rs a <> mempty)
   , QC.testProperty "associativity"   (\a b c -> rs a <> (rs b <> rs c) === (rs a <> rs b) <> rs c)
@@ -162,13 +184,14 @@ monoidLaws = testGroup "MonoidLaws"
 -- All QuickCheck properties
 qcProps :: TestTree
 qcProps = testGroup "QuickCheck properties"
-  [ QC.testProperty "element operations similar" elementsProp
-  , QC.testProperty "size consistent" sizeProp
-  , QC.testProperty "null operation similar" nullProp
-  , QC.testProperty "member operation similar" memberProp
-  , QC.testProperty "notMember operation similar" notMemberProp
-  , QC.testProperty "range operations similar" rangeProp
-  , QC.testProperty "ranges remain ordered" orderedProp
+  [ QC.testProperty "element operations are similar" elementsProp
+  , QC.testProperty "size is consistent" sizeProp
+  , QC.testProperty "null operation is similar" nullProp
+  , QC.testProperty "member operation is similar" memberProp
+  , QC.testProperty "notMember operation is similar" notMemberProp
+  , QC.testProperty "range operations is similar" rangeProp
+  , QC.testProperty "ranges remain is ordered" orderedProp
   , complementProps
+  , minMaxProps
   , monoidLaws
   ]

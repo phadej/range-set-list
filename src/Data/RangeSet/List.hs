@@ -58,6 +58,10 @@ module Data.RangeSet.List (
   , difference
   , intersection
 
+  -- * Min/Max
+  , findMin
+  , findMax
+
   -- * Complement
   , complement
 
@@ -204,6 +208,20 @@ intersection a b = a \\ (a \\ b)
 -- | /O(n)/. Complement of the set.
 complement :: (Ord a, Enum a, Bounded a) => RSet a -> RSet a
 complement a = full `difference` a
+
+{- Min/Max -}
+
+-- | /O(1)/. The minimal element of a set.
+findMin :: RSet a -> a
+findMin (RSet ((x, _) : _))  = x
+findMin _                    = error "RangeSet.List.findMin: empty set"
+
+-- | /O(n)/. The minimal element of a set.
+findMax :: RSet a -> a
+findMax (RSet rs) = findMax' rs
+  where findMax' [(_, x)]  = x
+        findMax' (_:xs)    = findMax' xs
+        findMax' _         = error "RangeSet.List.findMax: empty set"
 
 {- Conversion -}
 
