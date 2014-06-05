@@ -1,5 +1,5 @@
 name:                range-set-list
-version:             0.0.6
+version:             0.0.7
 synopsis:            Memory efficient sets with continuous ranges of elements.
 description:         Memory efficient sets with continuous ranges of elements. List based implementation. Interface mimics "Data.Set" interface where possible.
 homepage:            https://github.com/phadej/range-set-list
