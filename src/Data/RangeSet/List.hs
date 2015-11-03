@@ -77,6 +77,7 @@ module Data.RangeSet.List (
 import Prelude hiding (filter,foldl,foldr,null,map)
 import qualified Prelude
 
+import Data.Semigroup (Semigroup(..))
 import Data.Monoid (Monoid(..))
 
 -- | Internally set is represented as sorted list of distinct inclusive ranges.
@@ -85,6 +86,9 @@ newtype RSet a = RSet [(a, a)]
 
 instance Show a => Show (RSet a) where
   show (RSet xs) = "fromRangeList " ++ show xs
+
+instance (Ord a, Enum a) => Semigroup (RSet a) where
+    (<>) = union
 
 instance (Ord a, Enum a) => Monoid (RSet a) where
     mempty  = empty

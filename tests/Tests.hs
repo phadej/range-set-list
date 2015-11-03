@@ -10,7 +10,7 @@ import qualified Data.RangeSet.List as RSet
 import Control.Applicative
 import Data.Int
 
-import Data.Monoid
+import Data.Semigroup
 
 main :: IO ()
 main = defaultMain tests

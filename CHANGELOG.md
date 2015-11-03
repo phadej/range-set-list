@@ -1,3 +1,11 @@
+### 0.1.1.0
+
+- Add `Semigroup` instance
+
+### 0.1.0.0
+
+- Consider API stable
+
 ### 0.0.7
 
 - `findMin` &amp; `findMax`
