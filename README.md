@@ -1,6 +1,10 @@
 # range-set-list
 
 [![Build Status](https://travis-ci.org/phadej/range-set-list.svg?branch=travis-expr)](https://travis-ci.org/phadej/range-set-list)
+[![Hackage](https://img.shields.io/hackage/v/range-set-list.svg)](http://hackage.haskell.org/package/range-set-list)
+[![Stackage LTS 2](http://stackage.org/package/range-set-list/badge/lts-2)](http://stackage.org/lts-2/package/range-set-list)
+[![Stackage LTS 3](http://stackage.org/package/range-set-list/badge/lts-3)](http://stackage.org/lts-3/package/range-set-list)
+[![Stackage Nightly](http://stackage.org/package/range-set-list/badge/nightly)](http://stackage.org/nightly/package/range-set-list)
 
 A trivial implementation of range sets.
 
