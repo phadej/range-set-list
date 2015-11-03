@@ -30,6 +30,7 @@ and there aren't elements in between (not true for 'Float' and 'Double').
 Also 'succ' and 'pred' are never called for largest or smallest value respectively.
 -}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE Safe #-}
 module Data.RangeSet.List (
   -- * Range set type
   RSet
