@@ -1,6 +1,6 @@
 ### 0.1.1.0
 
-- Add `Semigroup` instance
+- Add `Semigroup`, `NFData`, `Hashable` and `Typeable` instances
 
 ### 0.1.0.0
 

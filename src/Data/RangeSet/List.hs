@@ -29,7 +29,7 @@ The implementation assumes that
 and there aren't elements in between (not true for 'Float' and 'Double').
 Also 'succ' and 'pred' are never called for largest or smallest value respectively.
 -}
-
+{-# LANGUAGE DeriveDataTypeable #-}
 module Data.RangeSet.List (
   -- * Range set type
   RSet
@@ -77,12 +77,15 @@ module Data.RangeSet.List (
 import Prelude hiding (filter,foldl,foldr,null,map)
 import qualified Prelude
 
+import Control.DeepSeq (NFData(..))
+import Data.Typeable (Typeable)
 import Data.Semigroup (Semigroup(..))
 import Data.Monoid (Monoid(..))
+import Data.Hashable (Hashable(..))
 
 -- | Internally set is represented as sorted list of distinct inclusive ranges.
 newtype RSet a = RSet [(a, a)]
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Typeable)
 
 instance Show a => Show (RSet a) where
   show (RSet xs) = "fromRangeList " ++ show xs
@@ -93,6 +96,12 @@ instance (Ord a, Enum a) => Semigroup (RSet a) where
 instance (Ord a, Enum a) => Monoid (RSet a) where
     mempty  = empty
     mappend = union
+
+instance Hashable a => Hashable (RSet a) where
+    hashWithSalt salt (RSet xs) = hashWithSalt salt xs
+
+instance NFData a => NFData (RSet a) where
+    rnf (RSet xs) = rnf xs
 
 {- Operators -}
 infixl 9 \\ --
