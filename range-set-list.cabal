@@ -28,6 +28,7 @@ source-repository head
 library
   hs-source-dirs:
     src
+  other-extensions: DeriveDataTypeable
   ghc-options: -Wall -fwarn-tabs
   build-depends:
     base        >=4.5      && <4.9,

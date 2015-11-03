@@ -22,6 +22,8 @@ dependencies:
 
 library:
   source-dirs: src
+  other-extensions:
+    - DeriveDataTypeable
 
 tests:
   test:
