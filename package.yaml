@@ -6,7 +6,7 @@ author: Oleg Grenrus <oleg.grenrus@iki.fi>
 maintainer: Oleg Grenrus <oleg.grenrus@iki.fi>
 license: MIT
 github: phadej/range-set-list
-category: Documentation
+category: Data
 tested-with: GHC==7.4.2, GHC==7.6.3, GHC==7.8.4, GHC==7.10.2
 extra-source-files:
   - README.md
