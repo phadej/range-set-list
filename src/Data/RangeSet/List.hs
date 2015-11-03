@@ -40,6 +40,7 @@ module Data.RangeSet.List (
 
   -- * Query
   , null
+  , isFull
   , size
   , member
   , notMember
@@ -116,6 +117,10 @@ m1 \\ m2 = difference m1 m2
 -- | /O(1)/. Is this the empty set?
 null :: RSet a -> Bool
 null = Prelude.null . toRangeList
+
+-- | /O(1)/. Is this the full set?
+isFull :: (Eq a, Bounded a) => RSet a -> Bool
+isFull = (==) full
 
 -- | /O(n)/. The number of the elements in the set.
 size :: Enum a => RSet a -> Int
