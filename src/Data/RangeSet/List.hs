@@ -85,6 +85,8 @@ module Data.RangeSet.List (
   , toAscList
   , toRangeList
   , fromRangeList
+  , fromNormalizedRangeList
+  , toSet
 
   ) where
 
@@ -95,6 +97,7 @@ import Control.DeepSeq (NFData(..))
 import Data.Foldable (foldMap)
 import Data.Maybe (isJust)
 import Data.Monoid (Monoid(..), getSum)
+import qualified Data.Set as Set
 import Data.Typeable (Typeable)
 import Data.Semigroup (Semigroup(..))
 import Data.Hashable (Hashable(..))
@@ -268,6 +271,8 @@ intersection (RSet xs) (RSet ys) = RSet $ intersectRangeList xs ys
 complement :: (Ord a, Enum a, Bounded a) => RSet a -> RSet a
 complement (RSet xs) = RSet $ complementRangeList xs
 
+{- Filter -}
+
 -- MISSING: filter partition filterRanges? partitionRanges?
 
 -- | /O(n)/. The expression (@'split' x set@) is a pair @(set1,set2)@
@@ -331,7 +336,7 @@ fromList = RSet . fromElemList
 fromAscList :: (Ord a, Enum a) => [a] -> RSet a
 fromAscList = RSet . fromAscElemList
 
--- | /O(n)/. Convert the set to an ascending list of elements.
+-- | /O(n*r)/. Convert the set to an ascending list of elements.
 toAscList :: Enum a => RSet a -> [a]
 toAscList = toList
 
@@ -343,5 +348,13 @@ toRangeList (RSet xs) = xs
 fromRangeList :: (Ord a, Enum a) => [(a, a)] -> RSet a
 fromRangeList = RSet . normalizeRangeList
 
--- MISSING: fromDistinctAscList fromAscRangeList fromDistinctAscRangeList
--- fromDistinctAscRangeList = RSet, probably
+-- | /O(n*r)/. Convert the set to a 'Set.Set' of elements. /r/ is the size of longest range.
+toSet :: Enum a => RSet a -> Set.Set a
+toSet = Set.fromDistinctAscList . toAscList
+
+-- | /O(1)/. Convert a normalized, non-adjacent, ascending list of ranges to a set.
+-- /The precondition is not checked./  In general you should only use this function on the result of 'toRangeList'.
+fromNormalizedRangeList :: [(a, a)] -> RSet a
+fromNormalizedRangeList = RSet
+
+-- MISSING: fromDistinctAscList fromAscRangeList

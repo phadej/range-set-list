@@ -1,7 +1,8 @@
 name: range-set-list
 version: 0.1.1.0
 synopsis: Memory efficient sets with continuous ranges of elements.
-description: Memory efficient sets with continuous ranges of elements. List based implementation. Interface mimics 'Data.Set' interface where possible.
+synopsis: Memory efficient sets with ranges of elements.
+description: Memory efficient sets with continuous ranges of discrete, bounded elements. List- and map-based implementations. Interface mimics 'Data.Set' where possible.
 author: Oleg Grenrus <oleg.grenrus@iki.fi>
 maintainer: Oleg Grenrus <oleg.grenrus@iki.fi>
 license: MIT
