@@ -76,8 +76,28 @@ nullProp seta = Set.null (toSet seta) === RSet.null (toRSet seta)
 memberProp :: Int -> SetAction Int -> Property
 memberProp x seta = Set.member x (toSet seta) === RSet.member x (toRSet seta)
 
-notMemberProp :: Int -> SetAction Int -> Property
-notMemberProp x seta = Set.notMember x (toSet seta) === RSet.notMember x (toRSet seta)
+notMemberProp :: Int -> RSetAction Int -> Property
+notMemberProp x seta = Set.notMember x (rangeToSet seta) === RSet.notMember x (rangeToRSet seta)
+
+lookupLTProp :: Int -> RSetAction Int -> Property
+lookupLTProp x seta = Set.lookupLT x (rangeToSet seta) === RSet.lookupLT x (rangeToRSet seta)
+
+lookupGTProp :: Int -> SetAction Int -> Property
+lookupGTProp x seta = Set.lookupGT x (toSet seta) === RSet.lookupGT x (toRSet seta)
+
+lookupLEProp :: Int -> SetAction Int -> Property
+lookupLEProp x seta = Set.lookupLE x (toSet seta) === RSet.lookupLE x (toRSet seta)
+
+lookupGEProp :: Int -> RSetAction Int -> Property
+lookupGEProp x seta = Set.lookupGE x (rangeToSet seta) === RSet.lookupGE x (rangeToRSet seta)
+
+isSubsetProp :: SetAction Int -> RSetAction Int -> Property
+isSubsetProp seta setb = Set.isSubsetOf (toSet seta) (rangeToSet setb) === RSet.isSubsetOf (toRSet seta) (rangeToRSet setb)
+
+splitProp :: Int -> RSetAction Int -> Property
+splitProp x seta = Set.elems sl === RSet.elems rl .&&. sm === rm .&&. Set.elems su === RSet.elems ru where
+  (sl, sm, su) = Set.splitMember x (rangeToSet seta)
+  (rl, rm, ru) = RSet.splitMember x (rangeToRSet seta)
 
 data RSetAction a = RAEmpty
                   | RASingleton (a, a)
@@ -139,7 +159,11 @@ pairOrdered = all (uncurry (<=))
 
 orderedProp :: RSetAction Int8 -> Bool
 orderedProp setAction = ordered rs && pairOrdered rs
-  where rs = RSet.toRangeList . rangeToRSet $ setAction
+  where rs = RSet.toRangeList $ rangeToRSet $ setAction
+
+ascListProp :: RSetAction Int8 -> Property
+ascListProp setAction = RSet.fromAscList (RSet.toAscList rs) === rs
+  where rs = rangeToRSet setAction
 
 -- Complement laws
 complementProps :: TestTree
@@ -189,8 +213,15 @@ qcProps = testGroup "QuickCheck properties"
   , QC.testProperty "null operation is similar" nullProp
   , QC.testProperty "member operation is similar" memberProp
   , QC.testProperty "notMember operation is similar" notMemberProp
+  , QC.testProperty "lookupLT operation is similar" lookupLTProp
+  , QC.testProperty "lookupGT operation is similar" lookupGTProp
+  , QC.testProperty "lookupLE operation is similar" lookupLEProp
+  , QC.testProperty "lookupGE operation is similar" lookupGEProp
+  , QC.testProperty "isSubset operation is similar" isSubsetProp
+  , QC.testProperty "split operation is similar" splitProp
   , QC.testProperty "range operations is similar" rangeProp
   , QC.testProperty "ranges remain is ordered" orderedProp
+  , QC.testProperty "fromAscList . toAscList === id" ascListProp
   , complementProps
   , minMaxProps
   , monoidLaws

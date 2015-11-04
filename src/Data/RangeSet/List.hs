@@ -44,6 +44,12 @@ module Data.RangeSet.List (
   , size
   , member
   , notMember
+  , lookupLT
+  , lookupGT
+  , lookupLE
+  , lookupGE
+  , containsRange
+  , isSubsetOf
 
   -- * Construction
   , empty
@@ -60,6 +66,10 @@ module Data.RangeSet.List (
   , difference
   , intersection
 
+  -- * Filter
+  , split
+  , splitMember
+
   -- * Min/Max
   , findMin
   , findMax
@@ -71,6 +81,8 @@ module Data.RangeSet.List (
   , elems
   , toList
   , fromList
+  , fromAscList
+  , toAscList
   , toRangeList
   , fromRangeList
 
@@ -81,9 +93,10 @@ import qualified Prelude
 
 import Control.DeepSeq (NFData(..))
 import Data.Foldable (foldMap)
+import Data.Maybe (isJust)
+import Data.Monoid (Monoid(..), getSum)
 import Data.Typeable (Typeable)
 import Data.Semigroup (Semigroup(..))
-import Data.Monoid (Monoid(..), getSum)
 import Data.Hashable (Hashable(..))
 
 import Data.RangeSet.Internal
@@ -141,6 +154,55 @@ member x (RSet xs) = f xs where
 -- | /O(n)/. Is the element not in the set?
 notMember :: Ord a => a -> RSet a -> Bool
 notMember a r = not $ member a r
+
+-- | /O(n)/. Find largest element smaller than the given one.
+lookupLT :: (Ord a, Enum a) => a -> RSet a -> Maybe a
+lookupLT x (RSet xs) = f Nothing xs where
+  f l ((a,b):s)
+    | x <= a = l
+    | x <= b || pred x == b = Just (pred x)
+    | otherwise = f (Just b) s
+  f l [] = l
+
+-- | /O(n)/. Find smallest element greater than the given one.
+lookupGT :: (Ord a, Enum a) => a -> RSet a -> Maybe a
+lookupGT x (RSet xs) = f xs where
+  f ((a,b):s)
+    | x < a = Just a
+    | x < b = Just (succ x)
+    | otherwise = f s
+  f [] = Nothing
+
+-- | /O(n)/. Find largest element smaller or equal to than the given one.
+lookupLE :: Ord a => a -> RSet a -> Maybe a
+lookupLE x (RSet xs) = f Nothing xs where
+  f l ((a,b):s)
+    | x < a = l
+    | x <= b = Just x
+    | otherwise = f (Just b) s
+  f l [] = l
+
+-- | /O(n)/. Find smallest element greater or equal to than the given one.
+lookupGE :: Ord a => a -> RSet a -> Maybe a
+lookupGE x (RSet xs) = f xs where
+  f ((a,b):s)
+    | x <= a = Just a
+    | x <= b = Just x
+    | otherwise = f s
+  f [] = Nothing
+
+-- | /O(n)/. Is the entire range contained within the set?
+containsRange :: Ord a => (a, a) -> RSet a -> Bool
+containsRange (x,y) (RSet xs)
+  | x <= y = isJust $ rangeIsSubsetList x y xs
+  | otherwise = True
+
+-- | /O(n+m)/. Is this a subset?
+-- @(s1 `isSubsetOf` s2)@ tells whether @s1@ is a subset of @s2@.
+isSubsetOf :: Ord a => RSet a -> RSet a -> Bool
+isSubsetOf (RSet xs) (RSet ys) = isSubsetRangeList xs ys
+
+-- MISSING: isProperSubsetOf isRangeProperSubsetOf? overlapsRange?
 
 {- Construction -}
 
@@ -206,6 +268,34 @@ intersection (RSet xs) (RSet ys) = RSet $ intersectRangeList xs ys
 complement :: (Ord a, Enum a, Bounded a) => RSet a -> RSet a
 complement (RSet xs) = RSet $ complementRangeList xs
 
+-- MISSING: filter partition filterRanges? partitionRanges?
+
+-- | /O(n)/. The expression (@'split' x set@) is a pair @(set1,set2)@
+-- where @set1@ comprises the elements of @set@ less than @x@ and @set2@
+-- comprises the elements of @set@ greater than @x@.
+split :: (Ord a, Enum a) => a -> RSet a -> (RSet a, RSet a)
+split x s = (l, r) where (l, _, r) = splitMember x s
+
+-- | /O(n)/. Performs a 'split' but also returns whether the pivot
+-- element was found in the original set.
+splitMember :: (Ord a, Enum a) => a -> RSet a -> (RSet a, Bool, RSet a)
+splitMember x (RSet xs) = f xs where
+  f s@(r@(a,b):s') = case compare x a of
+    LT -> (empty, False, RSet s)
+    EQ -> (empty, True, RSet xs')
+    GT
+      | x <= b -> (RSet [(a, pred x)], True, RSet xs')
+      | otherwise -> push r $ f s'
+    where
+    xs'
+      | x < b = (succ x,b):s'
+      | otherwise = s'
+  f [] = (empty, False, empty)
+  push r (RSet ls, b, RSet rs) = (RSet (r:ls), b, RSet rs)
+
+-- MISSING: lookupIndex findIndex elemAt deleteAt map mapMonotonic fold*
+-- mapMonotonic may be reasonable as just need to map range endpoints and check adjacency
+
 {- Min/Max -}
 
 -- | /O(1)/. The minimal element of a set.
@@ -219,6 +309,8 @@ findMax (RSet rs) = findMax' rs
   where findMax' [(_, x)]  = x
         findMax' (_:xs)    = findMax' xs
         findMax' _         = error "RangeSet.List.findMax: empty set"
+
+-- MISSING: deleteMin deleteMax deleteFindMin deleteFindMax minView maxView
 
 {- Conversion -}
 
@@ -234,6 +326,15 @@ toList (RSet xs) = concatMap (uncurry enumFromTo) xs
 fromList :: (Ord a, Enum a) => [a] -> RSet a
 fromList = RSet . fromElemList
 
+-- | /O(n)/. Create a set from a list of ascending elements.
+-- /The precondition is not checked./
+fromAscList :: (Ord a, Enum a) => [a] -> RSet a
+fromAscList = RSet . fromAscElemList
+
+-- | /O(n)/. Convert the set to an ascending list of elements.
+toAscList :: Enum a => RSet a -> [a]
+toAscList = toList
+
 -- | /O(1)/. Convert the set to a list of range pairs.
 toRangeList :: RSet a -> [(a, a)]
 toRangeList (RSet xs) = xs
@@ -241,3 +342,6 @@ toRangeList (RSet xs) = xs
 -- | /O(n*log n)/. Create a set from a list of range pairs.
 fromRangeList :: (Ord a, Enum a) => [(a, a)] -> RSet a
 fromRangeList = RSet . normalizeRangeList
+
+-- MISSING: fromDistinctAscList fromAscRangeList fromDistinctAscRangeList
+-- fromDistinctAscRangeList = RSet, probably
