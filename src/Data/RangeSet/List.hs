@@ -80,10 +80,13 @@ import Prelude hiding (filter,foldl,foldr,null,map)
 import qualified Prelude
 
 import Control.DeepSeq (NFData(..))
+import Data.Foldable (foldMap)
 import Data.Typeable (Typeable)
 import Data.Semigroup (Semigroup(..))
-import Data.Monoid (Monoid(..))
+import Data.Monoid (Monoid(..), getSum)
 import Data.Hashable (Hashable(..))
+
+import Data.RangeSet.Internal
 
 -- | Internally set is represented as sorted list of distinct inclusive ranges.
 newtype RSet a = RSet [(a, a)]
@@ -124,17 +127,19 @@ isFull = (==) full
 
 -- | /O(n)/. The number of the elements in the set.
 size :: Enum a => RSet a -> Int
-size (RSet xs) = sum (Prelude.map f xs)
-  where f (a, b) = fromEnum b - fromEnum a + 1
+size (RSet xs) = getSum $ foldMap (uncurry rangeSize) xs
 
 -- | /O(n)/. Is the element in the set?
-member :: (Ord a, Enum a) => a -> RSet a -> Bool
-member x (RSet xs) = any f $ takeWhile g xs
-  where f (a, b) = a <= x && x <= b
-        g (a,_) = a <= x
+member :: Ord a => a -> RSet a -> Bool
+member x (RSet xs) = f xs where
+  f ((a,b):s)
+    | x < a = False
+    | x <= b = True
+    | otherwise = f s
+  f [] = False
 
 -- | /O(n)/. Is the element not in the set?
-notMember :: (Ord a, Enum a) => a -> RSet a -> Bool
+notMember :: Ord a => a -> RSet a -> Bool
 notMember a r = not $ member a r
 
 {- Construction -}
@@ -145,88 +150,61 @@ empty = RSet []
 
 -- | /O(1)/. The full set.
 full :: Bounded a => RSet a
-full = RSet [(minBound, maxBound)]
+full = singletonRange' minBound maxBound
+
+singletonRange' :: a -> a -> RSet a
+singletonRange' x y = RSet [(x, y)]
 
 -- | /O(1)/. Create a singleton set.
 singleton :: a -> RSet a
-singleton x = RSet [(x, x)]
+singleton x = singletonRange' x x
 
 -- | /O(1)/. Create a continuos range set.
 singletonRange :: Ord a => (a, a) -> RSet a
 singletonRange (x, y) | x > y     = empty
-                      | otherwise = RSet [(x, y)]
+                      | otherwise = singletonRange' x y
 
 {- Construction -}
 
 -- | /O(n)/. Insert an element in a set.
 insert :: (Ord a, Enum a) => a -> RSet a -> RSet a
-insert x = insertRange (x, x)
+insert x (RSet xs) = RSet $ insertRangeList x x xs
 
 -- | /O(n)/. Insert a continuos range in a set.
 insertRange :: (Ord a, Enum a) => (a, a) -> RSet a -> RSet a
-insertRange r@(x, y) set@(RSet xs)
+insertRange (x, y) set@(RSet xs)
   | x > y      = set
-  | otherwise  = RSet $ insertRange' r xs
-
--- There are three possibilities we consider, when inserting into non-empty set:
--- * discretely less
--- * discretely more
--- * other
-insertRange' :: (Ord a, Enum a) => (a, a) -> [(a, a)] -> [(a, a)]
-insertRange' r        []  = [r]
-insertRange' r@(x, y) set@(s@(u, v) : xs)
-  | y < u && succ y /= u  = r : set
-  | v < x && succ v /= x  = s : insertRange' r xs
-  | otherwise             = insertRange' (min x u, max y v) xs
+  | otherwise  = RSet $ insertRangeList x y xs
 
 -- | /O(n). Delete an element from a set.
 delete :: (Ord a, Enum a) => a -> RSet a -> RSet a
-delete x = deleteRange (x, x)
+delete x (RSet xs) = RSet $ deleteRangeList x x xs
 
 -- | /O(n). Delete a continuos range from a set.
 deleteRange :: (Ord a, Enum a) => (a, a) -> RSet a -> RSet a
-deleteRange r@(x, y) set@(RSet xs)
+deleteRange (x, y) set@(RSet xs)
   | x > y      = set
-  | otherwise  = RSet $ deleteRange' r xs
-
--- There are 6 possibilities we consider, when deleting from non-empty set:
--- * less
--- * more
--- * strictly inside (splits)
--- * overlapping less-edge
--- * overlapping more-edge
--- * stricly larger
---
--- TODO: is there simpler rules, with less cases
-deleteRange' :: (Ord a, Enum a) => (a, a) -> [(a, a)] -> [(a, a)]
-deleteRange' _        []  = []
-deleteRange' r@(x, y) set@(s@(u, v) : xs)
-  | y < u                 = set
-  | v < x                 = s : deleteRange' r xs
-  | u < x && y < v        = (u, pred x) : (succ y, v) : xs
-  | y < v                 = (succ y, v) : xs
-  | u < x                 = (u, pred x) : deleteRange' r xs
-  | otherwise             = deleteRange' r xs
+  | otherwise  = RSet $ deleteRangeList x y xs
 
 {- Combination -}
 
--- | /O(n*m)/. The union of two sets.
+-- | /O(n+m)/. The union of two sets.
 union :: (Ord a, Enum a) => RSet a -> RSet a -> RSet a
-union set (RSet xs) = Prelude.foldr insertRange set xs
+union (RSet xs) (RSet ys) = RSet $ unionRangeList xs ys
 
--- | /O(n*m)/. Difference of two sets.
+-- | /O(n+m)/. Difference of two sets.
 difference :: (Ord a, Enum a) => RSet a -> RSet a -> RSet a
-difference set (RSet xs) = Prelude.foldr deleteRange set xs
+difference (RSet xs) (RSet ys) = RSet $ differenceRangeList xs ys
 
--- | /O(n*m)/. The intersection of two sets.
-intersection :: (Ord a, Enum a) => RSet a -> RSet a -> RSet a
-intersection a b = a \\ (a \\ b)
+-- | /O(n+m)/. The intersection of two sets.
+intersection :: (Ord a) => RSet a -> RSet a -> RSet a
+intersection (RSet xs) (RSet ys) = RSet $ intersectRangeList xs ys
 
 {- Complement -}
 
 -- | /O(n)/. Complement of the set.
 complement :: (Ord a, Enum a, Bounded a) => RSet a -> RSet a
-complement a = full `difference` a
+complement (RSet xs) = RSet $ complementRangeList xs
 
 {- Min/Max -}
 
@@ -252,15 +230,14 @@ elems = toList
 toList :: Enum a => RSet a -> [a]
 toList (RSet xs) = concatMap (uncurry enumFromTo) xs
 
--- | /O(n^2)/. Create a set from a list of elements.
+-- | /O(n*log n)/. Create a set from a list of elements.
 fromList :: (Ord a, Enum a) => [a] -> RSet a
-fromList = fromRangeList . Prelude.map f
-  where f a = (a, a)
+fromList = RSet . fromElemList
 
 -- | /O(1)/. Convert the set to a list of range pairs.
 toRangeList :: RSet a -> [(a, a)]
 toRangeList (RSet xs) = xs
 
--- | /O(n^2)/. Create a set from a list of range pairs.
+-- | /O(n*log n)/. Create a set from a list of range pairs.
 fromRangeList :: (Ord a, Enum a) => [(a, a)] -> RSet a
-fromRangeList = Prelude.foldr insertRange empty
+fromRangeList = RSet . normalizeRangeList
