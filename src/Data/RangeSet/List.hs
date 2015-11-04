@@ -319,9 +319,9 @@ findMax (RSet rs) = findMax' rs
 
 {- Conversion -}
 
--- | /O(n*r)/. Convert the set to a list of elements. /r/ is the size of longest range.
+-- | /O(n*r)/. An alias of 'toAscList'. The elements of a set in ascending order. /r/ is the size of longest range.
 elems :: Enum a => RSet a -> [a]
-elems = toList
+elems = toAscList
 
 -- | /O(n*r)/. Convert the set to a list of elements. /r/ is the size of longest range.
 toList :: Enum a => RSet a -> [a]

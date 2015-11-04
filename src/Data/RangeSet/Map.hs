@@ -281,11 +281,11 @@ findMax (RSet m) = snd $ Map.findMax m
 unRangeList :: [(a, a)] -> RSet a
 unRangeList = RSet . Map.fromDistinctAscList
 
--- | /O(n*r)/. Convert the set to a list of elements. /r/ is the size of longest range.
+-- | /O(n*r)/. An alias of 'toAscList'. The elements of a set in ascending order. /r/ is the size of longest range.
 elems :: Enum a => RSet a -> [a]
-elems = toList
+elems = toAscList
 
--- | /O(n*r)/. Convert the set to a list of elements. /r/ is the size of longest range.
+-- | /O(n*r)/. Convert the set to a list of elements (in arbitrary order). /r/ is the size of longest range.
 toList :: Enum a => RSet a -> [a]
 toList (RSet xm) = Map.foldMapWithKey enumFromTo xm
 
@@ -300,7 +300,7 @@ fromAscList = unRangeList . fromAscElemList
 
 -- | /O(n*r)/. Convert the set to an ascending list of elements.
 toAscList :: Enum a => RSet a -> [a]
-toAscList = toList
+toAscList (RSet xm) = Map.foldrWithKey (\a -> (++) . enumFromTo a) [] xm
 
 -- | /O(n)/. Convert the set to a list of range pairs.
 toRangeList :: RSet a -> [(a, a)]
