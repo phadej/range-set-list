@@ -12,8 +12,7 @@ Most functions in this module deal with normalized (closed, fst <= snd, non-over
 
 -}
 module Data.RangeSet.Internal
-  ( (?)
-  , rangeSize
+  ( rangeSize
   , rangeIsSubsetList
   , isSubsetRangeList
   , insertRangeList
@@ -29,12 +28,6 @@ module Data.RangeSet.Internal
 
 import Data.Monoid (Sum(..))
 import Data.List (sort)
-
-infix 1 ?
-
-(?) :: Bool -> (a -> a) -> a -> a
-False ? _ = id
-True ? f = f
 
 -- |Determine the number of items in an 'Enum' range as a 'Sum'
 rangeSize :: Enum a => a -> a -> Sum Int

@@ -258,13 +258,16 @@ split x s = (l, r) where (l, _, r) = splitMember x s
 -- element was found in the original set.
 splitMember :: (Ord a, Enum a) => a -> RSet a -> (RSet a, Bool, RSet a)
 splitMember x (RSet xm)
-  | Just y <- xv = (RSet ml, True, RSet $ x < y ? Map.insert (succ x) y $ mr)
+  | Just y <- xv = (RSet ml, True, RSet $ insertIf (x < y) (succ x) y mr)
   | Just ((u,v), ml') <- Map.maxViewWithKey ml =
     if v < x
       then (RSet ml, False, RSet mr)
-      else (RSet $ u < x ? Map.insert u (pred x) $ ml', True, RSet $ x < v ? Map.insert (succ x) v $ mr)
+      else (RSet $ insertIf (u < x) u (pred x) ml', True, RSet $ insertIf (x < v) (succ x) v mr)
   | otherwise = (RSet ml {- empty -}, False, RSet {- mr -} xm)
-  where (ml, xv, mr) = Map.splitLookup x xm
+  where
+  (ml, xv, mr) = Map.splitLookup x xm
+  insertIf False _ _ = id
+  insertIf True a b = Map.insert a b
 
 {- Min/Max -}
 
