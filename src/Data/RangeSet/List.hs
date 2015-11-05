@@ -50,6 +50,7 @@ module Data.RangeSet.List (
   , lookupGE
   , containsRange
   , isSubsetOf
+  , valid
 
   -- * Construction
   , empty
@@ -332,7 +333,7 @@ fromList :: (Ord a, Enum a) => [a] -> RSet a
 fromList = RSet . fromElemList
 
 -- | /O(n)/. Create a set from a list of ascending elements.
--- /The precondition is not checked./
+-- /The precondition is not checked./  You may use 'valid' to check the result.
 fromAscList :: (Ord a, Enum a) => [a] -> RSet a
 fromAscList = RSet . fromAscElemList
 
@@ -353,8 +354,12 @@ toSet :: Enum a => RSet a -> Set.Set a
 toSet = Set.fromDistinctAscList . toAscList
 
 -- | /O(1)/. Convert a normalized, non-adjacent, ascending list of ranges to a set.
--- /The precondition is not checked./  In general you should only use this function on the result of 'toRangeList'.
+-- /The precondition is not checked./  In general you should only use this function on the result of 'toRangeList' or ensure 'valid' on the result.
 fromNormalizedRangeList :: [(a, a)] -> RSet a
 fromNormalizedRangeList = RSet
+
+-- | /O(n)/. Ensure that a set is valid. All functions should return valid sets except those with unchecked preconditions: 'fromAscList', 'fromNormalizedRangeList'
+valid :: (Ord a, Enum a, Bounded a) => RSet a -> Bool
+valid (RSet xs) = validRangeList xs
 
 -- MISSING: fromDistinctAscList fromAscRangeList

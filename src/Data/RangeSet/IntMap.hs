@@ -29,6 +29,7 @@ module Data.RangeSet.IntMap (
   , lookupGE
   , containsRange
   , isSubsetOf
+  , valid
 
   -- * Construction
   , empty
@@ -66,6 +67,7 @@ module Data.RangeSet.IntMap (
   , fromRangeList
   , fromRList
   , toRList
+  , fromNormalizedRangeList
 
   ) where
 
@@ -283,7 +285,7 @@ fromList :: [Int] -> RIntSet
 fromList = unRangeList . fromElemList
 
 -- | /O(n)/. Create a set from a list of ascending elements.
--- /The precondition is not checked./
+-- /The precondition is not checked./  You may use 'valid' to check the result.
 fromAscList :: [Int] -> RIntSet
 fromAscList = unRangeList . fromAscElemList
 
@@ -308,7 +310,11 @@ toRList :: RIntSet -> RList.RSet Int
 toRList = RList.fromNormalizedRangeList . toRangeList
 
 -- | /O(n)/. Convert a normalized, non-adjacent, ascending list of ranges to a set.
--- /The precondition is not checked./  In general you should only use this function on the result of 'toRangeList'.
+-- /The precondition is not checked./  In general you should only use this function on the result of 'toRangeList' or ensure 'valid' on the result.
 fromNormalizedRangeList :: [(Int, Int)] -> RIntSet
 fromNormalizedRangeList = RSet . Map.fromDistinctAscList
+
+-- | /O(n)/. Ensure that a set is valid. All functions should return valid sets except those with unchecked preconditions: 'fromAscList', 'fromNormalizedRangeList'
+valid :: RIntSet -> Bool
+valid = validRangeList . toRangeList
 

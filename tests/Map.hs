@@ -130,6 +130,15 @@ monoidLaws = testGroup "Monoid laws"
   ]
   where rs = rangeToRSet :: RSetAction Int -> RSet Int
 
+validProp :: SetAction Int -> Property
+validProp s = RSet.valid (toRSet s) === True
+
+validRProp :: RSetAction Int -> Property
+validRProp s = RSet.valid (rangeToRSet s) === True
+
+invalidProp :: Property
+invalidProp = RSet.valid (RSet.fromNormalizedRangeList [(-10,-1),(1,0),(2,3 :: Int)]) === False
+
 -- All QuickCheck properties
 mapProps :: TestTree
 mapProps = testGroup "QuickCheck Map properties"
@@ -150,4 +159,7 @@ mapProps = testGroup "QuickCheck Map properties"
   , complementProps
   , minMaxProps
   , monoidLaws
+  , QC.testProperty "item sets valid" validProp
+  , QC.testProperty "range sets valid" validRProp
+  , QC.testProperty "fromNormalizedRangeList invalid" invalidProp
   ]

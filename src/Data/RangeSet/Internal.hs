@@ -24,6 +24,7 @@ module Data.RangeSet.Internal
   , fromAscElemList
   , fromElemList
   , normalizeRangeList
+  , validRangeList
   ) where
 
 import Data.Monoid (Sum(..))
@@ -177,3 +178,13 @@ mergeRangeList [] = []
 normalizeRangeList :: (Ord a, Enum a) => [(a, a)] -> [(a, a)]
 normalizeRangeList = mergeRangeList . sort . filter valid where
   valid (x,y) = x <= y
+
+-- |Check if a list is normalized and strictly above @b@.
+validRangeList' :: (Ord a, Enum a, Bounded a) => a -> [(a, a)] -> Bool
+validRangeList' b ((x,y):s) = b < maxBound && succ b < x && x <= y && validRangeList' y s
+validRangeList' _ [] = True
+
+-- |Check if a list is normalized.
+validRangeList :: (Ord a, Enum a, Bounded a) => [(a, a)] -> Bool
+validRangeList ((x,y):s) = x <= y && validRangeList' y s
+validRangeList [] = True
