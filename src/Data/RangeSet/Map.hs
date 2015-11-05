@@ -295,11 +295,13 @@ toList :: Enum a => RSet a -> [a]
 toList (RSet xm) = Map.foldMapWithKey enumFromTo xm
 
 -- | /O(n*log n)/. Create a set from a list of elements.
+-- Note that unlike "Data.Set" and other binary trees, this always requires a full sort and traversal to create distinct, disjoint ranges before constructing the tree.
 fromList :: (Ord a, Enum a) => [a] -> RSet a
 fromList = unRangeList . fromElemList
 
 -- | /O(n)/. Create a set from a list of ascending elements.
 -- /The precondition is not checked./  You may use 'valid' to check the result.
+-- Note that unlike "Data.Set" and other binary trees, this always requires a full traversal to create distinct, disjoint ranges before constructing the tree.
 fromAscList :: (Ord a, Enum a) => [a] -> RSet a
 fromAscList = unRangeList . fromAscElemList
 
@@ -312,6 +314,7 @@ toRangeList :: RSet a -> [(a, a)]
 toRangeList (RSet xs) = Map.toAscList xs
 
 -- | /O(n*log n)/. Create a set from a list of range pairs.
+-- Note that unlike "Data.Set" and other binary trees, this always requires a full sort and traversal to create distinct, disjoint ranges before constructing the tree.
 fromRangeList :: (Ord a, Enum a) => [(a, a)] -> RSet a
 fromRangeList = unRangeList . normalizeRangeList
 
