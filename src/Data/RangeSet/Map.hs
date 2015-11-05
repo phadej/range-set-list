@@ -333,5 +333,5 @@ fromNormalizedRangeList = RSet . Map.fromDistinctAscList
 
 -- | /O(n)/. Ensure that a set is valid. All functions should return valid sets except those with unchecked preconditions: 'fromAscList', 'fromNormalizedRangeList'
 valid :: (Ord a, Enum a, Bounded a) => RSet a -> Bool
-valid = validRangeList . toRangeList
+valid (RSet xm) = Map.valid xm && validRangeList (Map.toAscList xm)
 
