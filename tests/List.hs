@@ -5,7 +5,7 @@ import Test.Tasty.QuickCheck as QC
 
 import qualified Data.Set as Set
 
-import Data.RangeSet.List (RSet)
+import           Data.RangeSet.List (RSet)
 import qualified Data.RangeSet.List as RSet
 
 import Control.Applicative

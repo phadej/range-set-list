@@ -1,8 +1,8 @@
 import Test.Tasty
 
+import IntMap
 import List
 import Map
-import IntMap
 
 main :: IO ()
 main = defaultMain tests
