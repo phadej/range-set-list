@@ -3,7 +3,7 @@
 -- see: https://github.com/sol/hpack
 
 name:                range-set-list
-version:             0.1.1.0
+version:             0.1.2.0
 synopsis:            Memory efficient sets with ranges of elements.
 description:         Memory efficient sets with continuous ranges of discrete, bounded elements. List- and map-based implementations. Interface mimics 'Data.Set' where possible.
 homepage:            https://github.com/phadej/range-set-list#readme

@@ -1,3 +1,7 @@
+### 0.1.2.0
+
+- Map implementations: `Data.RangeSet.IntMap` and `Data.RangeSet.Map`
+
 ### 0.1.1.0
 
 - Add `Semigroup`, `NFData`, `Hashable` and `Typeable` instances
