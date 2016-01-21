@@ -6,12 +6,17 @@ License     :  MIT
 
 A slightly less trivial implementation of range sets.
 
-This is nearly identical to "Data.RangeSet.List" except for some important performance differences:
+This is nearly identical to "Data.RangeSet.List" except for some important
+performance differences:
 
-* Most query functions in this module are /O(log n)/ rather than /O(n)/, so may be much faster.
-* Most composition functions have the same time complexity but a higher constant, so may be somewhat slower.
+* Most query functions in this module are /O(log n)/ rather than /O(n)/, so may
+  be much faster.
+* Most composition functions have the same time complexity but a higher
+  constant, so may be somewhat slower.
 
-If you're mainly calling 'member', you should consider using this module, but if you're calling 'union', 'deleteRange', and other range manipulation functions as often as querying, you might stick with the list implementation.
+If you're mainly calling 'member', you should consider using this module, but
+if you're calling 'union', 'deleteRange', and other range manipulation
+functions as often as querying, you might stick with the list implementation.
 
 This module is intended to be imported qualified, to avoid name
 clashes with Prelude functions, e.g.
@@ -23,7 +28,7 @@ The implementation of 'RSet' is based on "Data.Map.Strict".
 
 -}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE Safe               #-}
 module Data.RangeSet.Map (
   -- * Range set type
   RSet
@@ -85,18 +90,18 @@ module Data.RangeSet.Map (
 
   ) where
 
-import Prelude hiding (filter,foldl,foldr,null,map)
+import Prelude hiding (filter, foldl, foldr, map, null)
 
-import Control.DeepSeq (NFData(..))
-import qualified Data.Foldable as Fold
-import Data.Functor ((<$>))
+import           Control.DeepSeq (NFData (..))
+import qualified Data.Foldable   as Fold
+import           Data.Functor    ((<$>))
 import qualified Data.Map.Strict as Map
-import Data.Monoid (Monoid(..), getSum)
-import Data.Typeable (Typeable)
-import Data.Semigroup (Semigroup(..))
+import           Data.Monoid     (Monoid (..), getSum)
+import           Data.Semigroup  (Semigroup (..))
+import           Data.Typeable   (Typeable)
 
-import Data.RangeSet.Internal
-import qualified Data.RangeSet.List as RList
+import           Data.RangeSet.Internal
+import qualified Data.RangeSet.List     as RList
 
 -- | Internally set is represented as sorted list of distinct inclusive ranges.
 newtype RSet a = RSet (Map.Map a a)

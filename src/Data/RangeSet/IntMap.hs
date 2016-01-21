@@ -9,7 +9,7 @@ This is simply a specialization of "Data.RangeSet.Map" to 'Int'.
 The implementation of 'RIntSet' is based on "Data.IntMap.Strict".
 -}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE Safe               #-}
 module Data.RangeSet.IntMap (
   -- * Range set type
   RIntSet
@@ -71,18 +71,18 @@ module Data.RangeSet.IntMap (
 
   ) where
 
-import Prelude hiding (filter,foldl,foldr,null,map)
+import Prelude hiding (filter, foldl, foldr, map, null)
 
-import Control.DeepSeq (NFData(..))
-import qualified Data.Foldable as Fold
-import Data.Functor ((<$>))
+import           Control.DeepSeq    (NFData (..))
+import qualified Data.Foldable      as Fold
+import           Data.Functor       ((<$>))
 import qualified Data.IntMap.Strict as Map
-import Data.Monoid (Monoid(..), getSum)
-import Data.Typeable (Typeable)
-import Data.Semigroup (Semigroup(..))
+import           Data.Monoid        (Monoid (..), getSum)
+import           Data.Semigroup     (Semigroup (..))
+import           Data.Typeable      (Typeable)
 
-import Data.RangeSet.Internal
-import qualified Data.RangeSet.List as RList
+import           Data.RangeSet.Internal
+import qualified Data.RangeSet.List     as RList
 
 -- | Internally set is represented as sorted list of distinct inclusive ranges.
 newtype RIntSet = RSet (Map.IntMap Int)
@@ -272,22 +272,30 @@ findMax (RSet m) = snd $ Map.findMax m
 unRangeList :: [(Int, Int)] -> RIntSet
 unRangeList = RSet . Map.fromDistinctAscList
 
--- | /O(n*r)/. An alias of 'toAscList'. The elements of a set in ascending order. /r/ is the size of longest range.
+-- | /O(n*r)/. An alias of 'toAscList'. The elements of a set in ascending
+-- order. /r/ is the size of longest range.
 elems :: RIntSet -> [Int]
 elems = toAscList
 
--- | /O(n*r)/. Convert the set to a list of elements (in arbitrary order). /r/ is the size of longest range.
+-- | /O(n*r)/. Convert the set to a list of elements (in arbitrary order). /r/
+-- is the size of longest range.
 toList :: RIntSet -> [Int]
 toList (RSet xm) = Map.foldMapWithKey enumFromTo xm
 
 -- | /O(n*log n)/. Create a set from a list of elements.
--- Note that unlike "Data.Set" and other binary trees, this always requires a full sort and traversal to create distinct, disjoint ranges before constructing the tree.
+--
+-- Note that unlike "Data.Set" and other binary trees, this always requires a
+-- full sort and traversal to create distinct, disjoint ranges before
+-- constructing the tree.
 fromList :: [Int] -> RIntSet
 fromList = unRangeList . fromElemList
 
 -- | /O(n)/. Create a set from a list of ascending elements.
+--
 -- /The precondition is not checked./  You may use 'valid' to check the result.
--- Note that unlike "Data.Set" and other binary trees, this always requires a full traversal to create distinct, disjoint ranges before constructing the tree.
+-- Note that unlike "Data.Set" and other binary trees, this always requires a
+-- full traversal to create distinct, disjoint ranges before constructing the
+-- tree.
 fromAscList :: [Int] -> RIntSet
 fromAscList = unRangeList . fromAscElemList
 
@@ -300,7 +308,10 @@ toRangeList :: RIntSet -> [(Int, Int)]
 toRangeList (RSet xs) = Map.toAscList xs
 
 -- | /O(n*log n)/. Create a set from a list of range pairs.
--- Note that unlike "Data.Set" and other binary trees, this always requires a full sort and traversal to create distinct, disjoint ranges before constructing the tree.
+--
+-- Note that unlike "Data.Set" and other binary trees, this always requires a
+-- full sort and traversal to create distinct, disjoint ranges before
+-- constructing the tree.
 fromRangeList :: [(Int, Int)] -> RIntSet
 fromRangeList = unRangeList . normalizeRangeList
 
@@ -313,11 +324,15 @@ toRList :: RIntSet -> RList.RSet Int
 toRList = RList.fromNormalizedRangeList . toRangeList
 
 -- | /O(n)/. Convert a normalized, non-adjacent, ascending list of ranges to a set.
--- /The precondition is not checked./  In general you should only use this function on the result of 'toRangeList' or ensure 'valid' on the result.
+--
+-- /The precondition is not checked./  In general you should only use this
+-- function on the result of 'toRangeList' or ensure 'valid' on the result.
 fromNormalizedRangeList :: [(Int, Int)] -> RIntSet
 fromNormalizedRangeList = RSet . Map.fromDistinctAscList
 
--- | /O(n)/. Ensure that a set is valid. All functions should return valid sets except those with unchecked preconditions: 'fromAscList', 'fromNormalizedRangeList'
+-- | /O(n)/. Ensure that a set is valid. All functions should return valid sets
+-- except those with unchecked preconditions: 'fromAscList',
+-- 'fromNormalizedRangeList'
 valid :: RIntSet -> Bool
 valid = validRangeList . toRangeList
 

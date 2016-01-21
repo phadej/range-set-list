@@ -18,19 +18,20 @@ clashes with Prelude functions, e.g.
 
 The implementation of 'RSet' is based on /list/.
 
-Compared to 'Data.Set', this module imposes also 'Enum' restriction for many functions.
-We must be able to identify consecutive elements to be able to /glue/ and /split/ ranges properly.
+Compared to 'Data.Set', this module imposes also 'Enum' restriction for many
+functions.  We must be able to identify consecutive elements to be able to
+/glue/ and /split/ ranges properly.
 
 The implementation assumes that
 
 > x < succ x
 > pred x < x
 
-and there aren't elements in between (not true for 'Float' and 'Double').
-Also 'succ' and 'pred' are never called for largest or smallest value respectively.
+and there aren't elements in between (not true for 'Float' and 'Double').  Also
+'succ' and 'pred' are never called for largest or smallest value respectively.
 -}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE Safe #-}
+{-# LANGUAGE Safe               #-}
 module Data.RangeSet.List (
   -- * Range set type
   RSet
@@ -91,17 +92,17 @@ module Data.RangeSet.List (
 
   ) where
 
-import Prelude hiding (filter,foldl,foldr,null,map)
+import           Prelude hiding (filter, foldl, foldr, map, null)
 import qualified Prelude
 
-import Control.DeepSeq (NFData(..))
-import Data.Foldable (foldMap)
-import Data.Maybe (isJust)
-import Data.Monoid (Monoid(..), getSum)
-import qualified Data.Set as Set
-import Data.Typeable (Typeable)
-import Data.Semigroup (Semigroup(..))
-import Data.Hashable (Hashable(..))
+import           Control.DeepSeq (NFData (..))
+import           Data.Foldable   (foldMap)
+import           Data.Hashable   (Hashable (..))
+import           Data.Maybe      (isJust)
+import           Data.Monoid     (Monoid (..), getSum)
+import           Data.Semigroup  (Semigroup (..))
+import qualified Data.Set        as Set
+import           Data.Typeable   (Typeable)
 
 import Data.RangeSet.Internal
 
@@ -320,11 +321,13 @@ findMax (RSet rs) = findMax' rs
 
 {- Conversion -}
 
--- | /O(n*r)/. An alias of 'toAscList'. The elements of a set in ascending order. /r/ is the size of longest range.
+-- | /O(n*r)/. An alias of 'toAscList'. The elements of a set in ascending
+-- order. /r/ is the size of longest range.
 elems :: Enum a => RSet a -> [a]
 elems = toAscList
 
--- | /O(n*r)/. Convert the set to a list of elements. /r/ is the size of longest range.
+-- | /O(n*r)/. Convert the set to a list of elements. /r/ is the size of
+-- longest range.
 toList :: Enum a => RSet a -> [a]
 toList (RSet xs) = concatMap (uncurry enumFromTo) xs
 
@@ -333,6 +336,7 @@ fromList :: (Ord a, Enum a) => [a] -> RSet a
 fromList = RSet . fromElemList
 
 -- | /O(n)/. Create a set from a list of ascending elements.
+--
 -- /The precondition is not checked./  You may use 'valid' to check the result.
 fromAscList :: (Ord a, Enum a) => [a] -> RSet a
 fromAscList = RSet . fromAscElemList
@@ -349,16 +353,22 @@ toRangeList (RSet xs) = xs
 fromRangeList :: (Ord a, Enum a) => [(a, a)] -> RSet a
 fromRangeList = RSet . normalizeRangeList
 
--- | /O(n*r)/. Convert the set to a 'Set.Set' of elements. /r/ is the size of longest range.
+-- | /O(n*r)/. Convert the set to a 'Set.Set' of elements. /r/ is the size of
+-- longest range.
 toSet :: Enum a => RSet a -> Set.Set a
 toSet = Set.fromDistinctAscList . toAscList
 
--- | /O(1)/. Convert a normalized, non-adjacent, ascending list of ranges to a set.
--- /The precondition is not checked./  In general you should only use this function on the result of 'toRangeList' or ensure 'valid' on the result.
+-- | /O(1)/. Convert a normalized, non-adjacent, ascending list of ranges to a
+-- set.
+--
+-- /The precondition is not checked./  In general you should only use this
+-- function on the result of 'toRangeList' or ensure 'valid' on the result.
 fromNormalizedRangeList :: [(a, a)] -> RSet a
 fromNormalizedRangeList = RSet
 
--- | /O(n)/. Ensure that a set is valid. All functions should return valid sets except those with unchecked preconditions: 'fromAscList', 'fromNormalizedRangeList'
+-- | /O(n)/. Ensure that a set is valid. All functions should return valid sets
+-- except those with unchecked preconditions: 'fromAscList',
+-- 'fromNormalizedRangeList'
 valid :: (Ord a, Enum a, Bounded a) => RSet a -> Bool
 valid (RSet xs) = validRangeList xs
 

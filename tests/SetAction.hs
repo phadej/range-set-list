@@ -2,7 +2,7 @@ module SetAction where
 
 import Test.Tasty.QuickCheck as QC
 
-import Data.Set (Set)
+import           Data.Set (Set)
 import qualified Data.Set as Set
 
 import Control.Applicative
