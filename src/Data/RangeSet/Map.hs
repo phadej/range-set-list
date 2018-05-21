@@ -145,11 +145,11 @@ contains' :: Ord a => a -> a -> RSet a -> Bool
 contains' x y (RSet xm) = Fold.any ((y <=) . snd) $ Map.lookupLE x xm
 
 -- | /O(log n)/. Is the element in the set?
-member :: (Ord a, Enum a) => a -> RSet a -> Bool
+member :: Ord a => a -> RSet a -> Bool
 member x = contains' x x
 
 -- | /O(log n)/. Is the element not in the set?
-notMember :: (Ord a, Enum a) => a -> RSet a -> Bool
+notMember :: Ord a => a -> RSet a -> Bool
 notMember a r = not $ member a r
 
 -- | /O(log n)/. Find largest element smaller than the given one.
