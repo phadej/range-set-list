@@ -1,3 +1,7 @@
+### 0.1.3
+
+- Data.RangeSet.Map.member doesn't require Enum
+
 ### 0.1.2.0
 
 - Map implementations: `Data.RangeSet.IntMap` and `Data.RangeSet.Map`
