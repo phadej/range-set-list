@@ -1,0 +1,3 @@
+branches: master
+installed: +all -containers
+tests: >= 7.8
