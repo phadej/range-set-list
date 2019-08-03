@@ -1,3 +1,7 @@
+### 0.1.3.1
+
+- Show instance print parens around
+
 ### 0.1.3
 
 - Data.RangeSet.Map.member doesn't require Enum

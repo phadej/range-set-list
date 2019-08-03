@@ -108,7 +108,9 @@ newtype RSet a = RSet (Map.Map a a)
   deriving (Eq, Ord, Typeable)
 
 instance Show a => Show (RSet a) where
-  show x = "fromRangeList " ++ show (toRangeList x)
+  showsPrec d x = showParen (d > 10)
+    $ showString "fromRangeList "
+    . showsPrec 11 (toRangeList x)
 
 instance (Ord a, Enum a) => Semigroup (RSet a) where
   (<>) = union
