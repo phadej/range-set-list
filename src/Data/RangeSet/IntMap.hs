@@ -89,7 +89,9 @@ newtype RIntSet = RSet (Map.IntMap Int)
   deriving (Eq, Ord, Typeable)
 
 instance Show RIntSet where
-  show x = "fromRangeList " ++ show (toRangeList x)
+  showsPrec d x = showParen (d > 10)
+    $ showString "fromRangeList "
+    . showsPrec 11 (toRangeList x)
 
 instance Semigroup RIntSet where
   (<>) = union
