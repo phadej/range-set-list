@@ -12,7 +12,7 @@ Most functions in this module deal with normalized (closed, fst <= snd,
 non-overlapping, non-adjacent, ordered) ranges, but do not check this
 assumption.  Most users should use a higher-level interface.
 -}
-{-# LANGUAGE Safe               #-}
+{-# LANGUAGE Safe #-}
 module Data.RangeSet.Internal
   ( rangeSize
   , rangeIsSubsetList
